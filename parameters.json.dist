@@ -1,0 +1,9 @@
+{
+	"compile" : true,
+	"test" : "prrob",
+	"server":{
+		"url":"http://tal.com",
+		"api":"ftp://cual.es"
+	},
+	"port" : 5000
+}
