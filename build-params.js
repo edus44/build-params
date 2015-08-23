@@ -41,6 +41,8 @@ if (dstExists){
 	fn.writeLine('  (Doesn\`t exists, will create new one)'.blue);
 }
 
+fn.fetchComments(src);
+
 fn.compareObject(src,dst,[])
 	.then(function(final){
 		fn.writeLine();

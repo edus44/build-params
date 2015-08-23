@@ -1,4 +1,10 @@
 {
+	"_comment" : {
+		"name" : "Package name",
+		"version" : "Version of the package",
+		"main" : "main one comment",
+		"repository.type" : "type of the repository"
+	},
   "name": "http-server",
   "version": "0.8.0",
   "description": "A simple zero-configuration command-line http server",

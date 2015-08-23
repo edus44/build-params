@@ -51,6 +51,16 @@ self.close = function(){
 };
 
 
+
+self.comments = {};
+self.fetchComments = function(obj){
+	self.comments = obj._comment || {};
+	delete obj._comment;
+};
+self.getComment = function(key){
+	return self.comments[key] || '';
+};
+
 self.compareObject = function(src,dst,parents){
 	var final={};
 	var done = q.defer();
@@ -100,8 +110,9 @@ self.prompt = function(key,srcVal,dstVal,parents){
 	if (parents.length){
 		key = parents.join('.')+'.'+key;
 	}
-	// var str = 'parents'+parents.join('.')+' key:'+key+' src:'+srcVal+' dst:'+dstVal+' final?'.green;
-	// 
+
+	var comment = self.getComment(key);
+
 	if (typeof dstVal == 'undefined'){
 		srcVal = colors.bgBlue.underline.black(srcVal);
 	}else{
@@ -110,6 +121,9 @@ self.prompt = function(key,srcVal,dstVal,parents){
 	}
 
 	self.writeLine();
+	if (comment){
+		self.writeLine(colors.grey('#'+comment));
+	}
 	self.write(key.green);
 	self.write(' [default '.yellow);
 	self.write(srcVal+']'.yellow);
