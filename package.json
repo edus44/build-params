@@ -2,13 +2,21 @@
   "name": "build-params",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build-params.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "colors": "^1.1.2"
+    "colors": "^1.1.2",
+    "moment": "^2.10.6",
+    "q": "^1.4.1",
+    "readline-sync": "^1.2.19",
+    "yargs": "^3.21.0"
+  },
+  "preferGlobal": "true",
+  "bin": {
+    "build-params": "./build-params.js"
   }
 }
