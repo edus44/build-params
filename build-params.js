@@ -38,7 +38,7 @@ fn.write	(path.basename(dstFile).blue);
 if (dstExists){
 	fn.writeLine(colors.blue('  (modified '+dstMoment.fromNow()+ ' - ' +dstMoment.format('DD-MM-YYYY hh:mm:ss')+')'));
 }else{
-	fn.writeLine('  (Doesn\`t exists, will create new one)'.blue);
+	fn.writeLine('  (Doesn\`t exists, will create new one)'.red);
 }
 
 fn.fetchComments(src);
@@ -51,7 +51,8 @@ fn.compareObject(src,dst,[])
 		fn.writeJson(dstFile,final);
 
 		fn.writeLine();
-		fn.writeLine('Done');
+		fn.writeLine('Writted succesfully'.green);
+		fn.writeLine();
 
 		fn.close();
 	});

@@ -12,6 +12,13 @@ var rl = readline.createInterface({
   output: process.stdout
 });
 
+//Fix color in prompt msg
+rl._setPrompt = rl.setPrompt;
+rl.setPrompt = function(prompt, length){
+    rl._setPrompt(prompt, length ? length : prompt.split(/[\r\n]/).pop().stripColors.length);
+};
+
+
 self.fileExists = function(file){
 	return fs.existsSync(file);
 };
@@ -29,11 +36,12 @@ self.getModifiedMoment = function(file){
 	return moment(stat.mtime);
 };
 
-self.question = function(msg){
+self.question = function(msg,def){
 	return q.Promise(function(resolve,request){
 		rl.question(msg, function(answer) {
 			resolve(answer);
 		});
+		self.write(def);
 	});
 };
 
@@ -87,18 +95,23 @@ self.compareObject = function(src,dst,parents){
 					next();
 				});
 		}else{
-			self.prompt(key,srcVal,dstVal,parents)
-				.then(function(finalVal){
-					if (finalVal === ''){
-						if (typeof dstVal != 'undefined'){
-							finalVal = dstVal;
-						}else{
-							finalVal = srcVal;
+			if (typeof dstVal != 'undefined'){
+				final[key] = dstVal;
+				next();
+			}else{
+				self.prompt(key,srcVal,dstVal,parents)
+					.then(function(finalVal){
+						if (finalVal === ''){
+							if (typeof dstVal != 'undefined'){
+								finalVal = dstVal;
+							}else{
+								finalVal = srcVal;
+							}
 						}
-					}
-					final[key] = finalVal;
-					next();
-				});
+						final[key] = finalVal;
+						next();
+					});
+			}
 		}
 	};
 
@@ -112,27 +125,27 @@ self.prompt = function(key,srcVal,dstVal,parents){
 	}
 
 	var comment = self.getComment(key);
+	var defVal;
 
 	if (typeof dstVal == 'undefined'){
-		srcVal = colors.bgBlue.underline.black(srcVal);
+		defVal = srcVal;
+		srcVal = colors.bold.underline.blue(srcVal);
 	}else{
-		srcVal = colors.blue(srcVal);
-		dstVal = colors.bgBlue.underline.black(dstVal);
+		defVal = dstVal;
+		srcVal = colors.bold.blue(srcVal);
+		dstVal = colors.bold.underline.blue(dstVal);
 	}
 
 	self.writeLine();
 	if (comment){
-		self.writeLine(colors.grey('#'+comment));
+		self.writeLine(colors.grey.bold('#'+comment));
 	}
-	self.write(key.green);
-	self.write(' [default '.yellow);
-	self.write(srcVal+']'.yellow);
+	self.writeLine('default '.yellow + srcVal);
 	if (typeof dstVal != 'undefined'){
-		self.write(' [current '.yellow);
-		self.write(dstVal+']'.yellow);
+		self.writeLine('current '.yellow + dstVal);
 	}
-	self.writeLine();
-	return self.question('> ');
+	return self.question(key.bold.green + ' > '.grey,defVal);
 };
+
 
 //writeJson(paramsFile,readJson(distParamsFile));
