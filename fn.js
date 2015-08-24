@@ -69,7 +69,10 @@ self.getComment = function(key){
 	return self.comments[key] || '';
 };
 
-self.compareObject = function(src,dst,parents){
+
+self.hasChanges = false;
+
+self.compareObject = function(src,dst,parents,options){
 	var final={};
 	var done = q.defer();
 
@@ -89,17 +92,18 @@ self.compareObject = function(src,dst,parents){
 		if (typeof srcVal=='object'){
 			var copyParents = parents.slice();
 			copyParents.push(key);
-			self.compareObject(srcVal,dstVal,copyParents)
+			self.compareObject(srcVal,dstVal,copyParents,options)
 				.then(function(finalVal){
 					final[key] = finalVal;
 					next();
 				});
 		}else{
-			if (typeof dstVal != 'undefined'){
+			if (!options.review && dstVal != 'undefined'){
 				final[key] = dstVal;
 				next();
 			}else{
-				self.prompt(key,srcVal,dstVal,parents)
+				self.hasChanges = true;
+				self.prompt(key,srcVal,dstVal,parents,options)
 					.then(function(finalVal){
 						if (finalVal === ''){
 							if (typeof dstVal != 'undefined'){

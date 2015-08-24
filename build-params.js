@@ -8,16 +8,17 @@ var package = require('./package.json');
 var argv = require('yargs').argv;
 
 var fn = require('./fn.js');
+var cwd = process.cwd();
 
-var testParamsFile = path.resolve(__dirname,'test.json');
+var testParamsFile = path.resolve(cwd,'test.json');
 
 //Source file
-var srcFile = path.resolve(__dirname,'parameters.json.dist');
+var srcFile = path.resolve(cwd,'parameters.json.dist');
 var src = fn.readJson(srcFile);
 var srcMoment = fn.getModifiedMoment(srcFile);
 
 //Destination file
-var dstFile = path.resolve(__dirname,'parameters.json');
+var dstFile = path.resolve(cwd,'parameters.json');
 var dstExists = fn.fileExists(dstFile);
 var dst = dstExists ? fn.readJson(dstFile) : {};
 var dstMoment = dstExists ? fn.getModifiedMoment(dstFile) : null;
@@ -26,7 +27,7 @@ fn.writeLine();
 fn.writeLine(package.name+' '+package.version);
 fn.writeLine();
 fn.writeLine('Current directory:'.green);
-fn.writeLine(__dirname.blue);
+fn.writeLine(cwd.blue);
 fn.writeLine();
 fn.writeLine('Source json file:'.green);
 fn.write	(path.basename(srcFile).blue);
@@ -43,17 +44,31 @@ if (dstExists){
 
 fn.fetchComments(src);
 
-fn.compareObject(src,dst,[])
+fn.compareObject(src,dst,[],{
+	review : !!argv.review
+})
 	.then(function(final){
-		fn.writeLine();
-		fn.writeLine('Final json file:'.green);
-		fn.writeLine(JSON.stringify(final,null,4).blue);
-		fn.writeJson(dstFile,final);
+		if (fn.hasChanges){
+			fn.writeLine();
+			fn.writeLine('Final json file:'.green);
+			fn.writeLine(JSON.stringify(final,null,4).blue);
+			fn.writeJson(dstFile,final);
 
-		fn.writeLine();
-		fn.writeLine('Writted succesfully'.green);
-		fn.writeLine();
+			fn.writeLine();
+			fn.writeLine('Writted succesfully'.green);
+			fn.writeLine();
+		}else{
+			fn.writeLine();
+			fn.writeLine('No changes were found'.yellow);
+			fn.writeLine('Use --review to navigate through all keys'.yellow);
+		}
 
+		fn.close();
+	})
+	.catch(function(err){
+		fn.writeLine();
+		fn.writeLine('Error happened'.red);
+		console.log(err);
 		fn.close();
 	});
 
