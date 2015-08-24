@@ -98,7 +98,7 @@ self.compareObject = function(src,dst,parents,options){
 					next();
 				});
 		}else{
-			if (!options.review && dstVal != 'undefined'){
+			if (!options.review && typeof dstVal != 'undefined'){
 				final[key] = dstVal;
 				next();
 			}else{
