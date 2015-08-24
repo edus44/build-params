@@ -1,9 +1,9 @@
 {
   "name": "build-params",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
-  "main": "build-params.js",
   "scripts": {
+    "start" : "node ./build-params.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
