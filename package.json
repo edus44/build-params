@@ -1,6 +1,6 @@
 {
   "name": "build-params",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "",
   "main": "build-params.js",
   "dependencies": {
@@ -24,7 +24,7 @@
     "url": "https://github.com/edus44/build-params/issues"
   },
   "homepage": "https://github.com/edus44/build-params",
-  
+
   "preferGlobal": "true",
   "bin": {
     "build-params": "./build-params.js"
