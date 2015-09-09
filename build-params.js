@@ -10,40 +10,93 @@ var argv = require('yargs').argv;
 var fn = require('./fn.js');
 var cwd = process.cwd();
 
-var testParamsFile = path.resolve(cwd,'test.json');
-
-//Source file
-var srcFile = path.resolve(cwd,'parameters.json.dist');
-var src = fn.readJson(srcFile);
-var srcMoment = fn.getModifiedMoment(srcFile);
-
-//Destination file
-var dstFile = path.resolve(cwd,'parameters.json');
-var dstExists = fn.fileExists(dstFile);
-var dst = dstExists ? fn.readJson(dstFile) : {};
-var dstMoment = dstExists ? fn.getModifiedMoment(dstFile) : null;
 
 fn.writeLine();
 fn.writeLine(package.name+' '+package.version);
-fn.writeLine();
+
+if (argv.help){
+	fn.writeLine();
+	fn.writeLine(' --help            Show this message'.yellow);
+	fn.writeLine(' --src=<filename>  Source (dist) JSON file (default=parameters.json.dist)'.yellow);
+	fn.writeLine(' --dst<filename>   Destination JSON file (default=parameters.json)'.yellow);
+	fn.writeLine(' --print           Navigate through all keys'.yellow);
+	fn.writeLine(' --review          Navigate through all keys'.yellow);
+	fn.writeLine();
+	fn.exit(0);
+}else{
+	fn.writeLine('Use --help to show available options');
+	fn.writeLine();
+}
+
+var srcFilename = argv.src || 'parameters.json.dist';
+var dstFilename = argv.dst || 'parameters.json';
+
+////////////////
+//Source file //
+////////////////
+var srcFile = path.resolve(cwd,srcFilename);
+
+//Handle file not found
+if (!fn.fileExists(srcFile)){
+	fn.writeLine(colors.red(srcFile+' not found'));
+	fn.exit();
+}
+
+try{
+	var src = fn.readJson(srcFile);
+}catch(e){
+	fn.writeLine(colors.red('Malformed JSON '+srcFile));
+	fn.exit();
+}
+var srcMoment = fn.getModifiedMoment(srcFile);
+
+/////////////////////
+//Destination file //
+/////////////////////
+var dstFile = path.resolve(cwd,dstFilename);
+var dstExists = fn.fileExists(dstFile);
+var dstMalformed = false;
+try{
+	var dst = dstExists ? fn.readJson(dstFile) : {};
+}catch(e){
+	dstMalformed = true;
+	dst = {};
+}
+var dstMoment = dstExists ? fn.getModifiedMoment(dstFile) : null;
+
+
+////////////////
+//Init output //
+////////////////
+//Cwd
 fn.writeLine('Current directory:'.green);
 fn.writeLine(cwd.blue);
 fn.writeLine();
+
+//Source file
 fn.writeLine('Source json file:'.green);
 fn.write	(path.basename(srcFile).blue);
 fn.writeLine(colors.blue('  (modified '+srcMoment.fromNow()+ ' - ' +srcMoment.format('DD-MM-YYYY hh:mm:ss')+')'));
 fn.writeLine();
+
+//Dest file
 fn.writeLine('Destination json file:'.green);
 
 fn.write	(path.basename(dstFile).blue);
 if (dstExists){
-	fn.writeLine(colors.blue('  (modified '+dstMoment.fromNow()+ ' - ' +dstMoment.format('DD-MM-YYYY hh:mm:ss')+')'));
+	if (dstMalformed){
+		fn.writeLine('  (Malformed JSON, will create new one)'.red);
+	}else{
+		fn.writeLine(colors.blue('  (modified '+dstMoment.fromNow()+ ' - ' +dstMoment.format('DD-MM-YYYY hh:mm:ss')+')'));
+	}
 }else{
 	fn.writeLine('  (Doesn\`t exists, will create new one)'.red);
 }
 
+//Save the _comment object
 fn.fetchComments(src);
 
+//Start the loop
 fn.compareObject(src,dst,[],{
 	review : !!argv.review
 })
@@ -69,6 +122,6 @@ fn.compareObject(src,dst,[],{
 		fn.writeLine();
 		fn.writeLine('Error happened'.red);
 		console.log(err);
-		fn.close();
+		fn.exit();
 	});
 

@@ -41,21 +41,26 @@ self.question = function(msg,def){
 		rl.question(msg, function(answer) {
 			resolve(answer);
 		});
-		self.write(def);
+		rl.write(def);
 	});
 };
 
 self.write = function(msg){
 	msg = typeof msg == 'string' ? msg : '';
-	rl.write(msg);
+	process.stdout.write(msg);
 };
 self.writeLine = function(msg){
 	msg = typeof msg == 'string' ? msg : '';
-	rl.write(msg+'\n');
+	process.stdout.write(msg+'\n');
 };
 
 self.close = function(){
 	rl.close();
+};
+
+self.exit = function(ret){
+	rl.close();
+	process.exit(typeof ret == 'undefined' ? 1 : ret);
 };
 
 
@@ -105,14 +110,29 @@ self.compareObject = function(src,dst,parents,options){
 				self.hasChanges = true;
 				self.prompt(key,srcVal,dstVal,parents,options)
 					.then(function(finalVal){
-						if (finalVal === ''){
-							if (typeof dstVal != 'undefined'){
-								finalVal = dstVal;
-							}else{
-								finalVal = srcVal;
+
+						//Casting to number
+						if(typeof srcVal == 'number'){
+							finalVal = parseFloat(finalVal);
+							if (isNaN(finalVal)){
+								i--;
+								self.writeLine('The value has to be a number'.red);
 							}
 						}
+
+						//Casting to boolean
+						if(typeof srcVal == 'boolean'){
+							if (finalVal!=='true' && finalVal!=='false'){
+								i--;
+								self.writeLine('The value has to be true or false'.red);
+							}
+							finalVal = finalVal === 'true';
+						}
+
+						//Value assignment
 						final[key] = finalVal;
+
+						//Next key
 						next();
 					});
 			}
@@ -130,6 +150,7 @@ self.prompt = function(key,srcVal,dstVal,parents){
 
 	var comment = self.getComment(key);
 	var defVal;
+	var srcType = typeof srcVal;
 
 	if (typeof dstVal == 'undefined'){
 		defVal = srcVal;
@@ -141,14 +162,18 @@ self.prompt = function(key,srcVal,dstVal,parents){
 	}
 
 	self.writeLine();
-	if (comment){
-		self.writeLine(colors.grey.bold('#'+comment));
-	}
-	self.writeLine('default '.yellow + srcVal);
+	self.write(key.bold.green);
+
+	if (srcType == 'number' || srcType == 'boolean')
+		self.write((' ['+srcType+']').grey);
+
+	self.writeLine(comment ? colors.grey.bold(' #'+comment): '');
+
+	self.writeLine('default: '.yellow + srcVal);
 	if (typeof dstVal != 'undefined'){
-		self.writeLine('current '.yellow + dstVal);
+		self.writeLine('current: '.yellow + dstVal);
 	}
-	return self.question(key.bold.green + ' > '.grey,defVal);
+	return self.question('    new: '.yellow,defVal+"");
 };
 
 
