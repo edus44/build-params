@@ -19,7 +19,8 @@ if (argv.help){
 	fn.writeLine(' --help            Show this message'.yellow);
 	fn.writeLine(' --src=<filename>  Source (dist) JSON file (default=parameters.json.dist)'.yellow);
 	fn.writeLine(' --dst<filename>   Destination JSON file (default=parameters.json)'.yellow);
-	fn.writeLine(' --print           Navigate through all keys'.yellow);
+	fn.writeLine(' --print-src       Print the source JSON file'.yellow);
+	fn.writeLine(' --print-dst       Print the destination JSON file'.yellow);
 	fn.writeLine(' --review          Navigate through all keys'.yellow);
 	fn.writeLine();
 	fn.exit(0);
@@ -93,6 +94,23 @@ if (dstExists){
 	fn.writeLine('  (Doesn\`t exists, will create new one)'.red);
 }
 
+if (argv.printSrc || argv.printDst){
+
+	if (argv.printSrc){
+		fn.writeLine();
+		fn.writeLine('Source JSON file:'.green);
+		fn.writeLine(JSON.stringify(src,null,4).blue);
+	}
+	if (argv.printDst){
+		fn.writeLine();
+		fn.writeLine('Destination JSON file:'.green);
+		fn.writeLine(JSON.stringify(dst,null,4).blue);
+	}
+	fn.exit();
+}
+
+
+
 //Save the _comment object
 fn.fetchComments(src);
 
@@ -103,7 +121,7 @@ fn.compareObject(src,dst,[],{
 	.then(function(final){
 		if (fn.hasChanges){
 			fn.writeLine();
-			fn.writeLine('Final json file:'.green);
+			fn.writeLine('Final JSON file:'.green);
 			fn.writeLine(JSON.stringify(final,null,4).blue);
 			fn.writeJson(dstFile,final);
 
