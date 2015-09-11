@@ -17,8 +17,9 @@ fn.writeLine(package.name+' '+package.version);
 if (argv.help){
 	fn.writeLine();
 	fn.writeLine(' --help            Show this message'.yellow);
-	fn.writeLine(' --src=<filename>  Source (dist) JSON file (default=parameters.json.dist)'.yellow);
-	fn.writeLine(' --dst<filename>   Destination JSON file (default=parameters.json)'.yellow);
+	fn.writeLine(' --src <filename>  Source (dist) JSON file (default=parameters.json.dist)'.yellow);
+	fn.writeLine(' --dst <filename>   Destination JSON file (default=parameters.json)'.yellow);
+	fn.writeLine(' --suffix          Suffix for \'parameters.{suffix}.json.dist\''.yellow);
 	fn.writeLine(' --print-src       Print the source JSON file'.yellow);
 	fn.writeLine(' --print-dst       Print the destination JSON file'.yellow);
 	fn.writeLine(' --review          Navigate through all keys'.yellow);
@@ -29,7 +30,8 @@ if (argv.help){
 	fn.writeLine();
 }
 
-var srcFilename = argv.src || 'parameters.json.dist';
+var suffix = argv.suffix ? argv.suffix+'.' : '';
+var srcFilename = argv.src || 'parameters.'+suffix+'json.dist';
 var dstFilename = argv.dst || 'parameters.json';
 
 ////////////////
