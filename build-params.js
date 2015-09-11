@@ -16,13 +16,13 @@ fn.writeLine(package.name+' '+package.version);
 
 if (argv.help){
 	fn.writeLine();
-	fn.writeLine(' --help            Show this message'.yellow);
-	fn.writeLine(' --src <filename>  Source (dist) JSON file (default=parameters.json.dist)'.yellow);
+	fn.writeLine(' --help             Show this message'.yellow);
+	fn.writeLine(' --src <filename>   Source (dist) JSON file (default=parameters.json.dist)'.yellow);
 	fn.writeLine(' --dst <filename>   Destination JSON file (default=parameters.json)'.yellow);
-	fn.writeLine(' --suffix          Suffix for \'parameters.{suffix}.json.dist\''.yellow);
-	fn.writeLine(' --print-src       Print the source JSON file'.yellow);
-	fn.writeLine(' --print-dst       Print the destination JSON file'.yellow);
-	fn.writeLine(' --review          Navigate through all keys'.yellow);
+	fn.writeLine(' --suffix <suffix>  Suffix for \'parameters.{suffix}.json.dist\''.yellow);
+	fn.writeLine(' --print-src        Print the source JSON file'.yellow);
+	fn.writeLine(' --print-dst        Print the destination JSON file'.yellow);
+	fn.writeLine(' --review           Navigate through all keys'.yellow);
 	fn.writeLine();
 	fn.exit(0);
 }else{
@@ -71,6 +71,11 @@ var dstMoment = dstExists ? fn.getModifiedMoment(dstFile) : null;
 ////////////////
 //Init output //
 ////////////////
+//Suffix
+fn.writeLine('Suffix:'.green);
+fn.writeLine(suffix.blue);
+fn.writeLine();
+
 //Cwd
 fn.writeLine('Current directory:'.green);
 fn.writeLine(cwd.blue);
