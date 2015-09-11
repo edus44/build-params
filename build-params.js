@@ -72,9 +72,11 @@ var dstMoment = dstExists ? fn.getModifiedMoment(dstFile) : null;
 //Init output //
 ////////////////
 //Suffix
-fn.writeLine('Suffix:'.green);
-fn.writeLine(suffix.blue);
-fn.writeLine();
+if (argv.suffix){
+	fn.writeLine('Suffix:'.green);
+	fn.writeLine(argv.suffix.blue);
+	fn.writeLine();
+}
 
 //Cwd
 fn.writeLine('Current directory:'.green);
