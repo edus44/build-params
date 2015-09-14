@@ -23,6 +23,7 @@ if (argv.help){
 	fn.writeLine(' --print-src        Print the source JSON file'.yellow);
 	fn.writeLine(' --print-dst        Print the destination JSON file'.yellow);
 	fn.writeLine(' --review           Navigate through all keys'.yellow);
+	fn.writeLine(' --check            Only check for differences between src and dst'.yellow);
 	fn.writeLine();
 	fn.exit(0);
 }else{
@@ -124,26 +125,48 @@ if (argv.printSrc || argv.printDst){
 fn.fetchComments(src);
 
 //Start the loop
+var check = !!argv.check;
 fn.compareObject(src,dst,[],{
-	review : !!argv.review
+	review : !!argv.review,
+	check : check,
 })
 	.then(function(final){
-		if (fn.hasChanges){
-			fn.writeLine();
-			fn.writeLine('Final JSON file:'.green);
-			fn.writeLine(JSON.stringify(final,null,4).blue);
-			fn.writeJson(dstFile,final);
 
-			fn.writeLine();
-			fn.writeLine('Writted succesfully'.green);
-			fn.writeLine();
+		if(!check){
+			if (fn.hasChanges){
+				fn.writeLine();
+				fn.writeLine('Final JSON file:'.green);
+				fn.writeLine(JSON.stringify(final,null,4).blue);
+				fn.writeJson(dstFile,final);
+		
+				fn.writeLine('Writted succesfully'.green);
+				fn.writeLine();
+			}else{
+				fn.writeLine();
+				fn.writeLine('No changes were found'.yellow);
+				fn.writeLine('Use --review to navigate through all keys'.yellow);
+			}
+			fn.close();
 		}else{
-			fn.writeLine();
-			fn.writeLine('No changes were found'.yellow);
-			fn.writeLine('Use --review to navigate through all keys'.yellow);
+
+			if (fn.hasChanges){			
+				fn.writeLine();
+				fn.writeLine('-------------------------------------'.yellow);
+				fn.writeLine('|  New keys found:'.yellow);
+				fn.writeLine('|  '.yellow+fn.newKeys.toString().yellow.bold);
+				fn.writeLine('-------------------------------------'.yellow);
+				fn.writeLine();
+			}else{
+				fn.writeLine();
+				fn.writeLine('-------------------------------------'.green);
+				fn.writeLine('| No changes were found'.green);
+				fn.writeLine('-------------------------------------'.green);
+			}
+			setTimeout(function(){
+				fn.close();
+			},1500);
 		}
 
-		fn.close();
 	})
 	.catch(function(err){
 		fn.writeLine();

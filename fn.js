@@ -76,6 +76,7 @@ self.getComment = function(key){
 
 
 self.hasChanges = false;
+self.newKeys = [];
 
 self.compareObject = function(src,dst,parents,options){
 	var final={};
@@ -108,33 +109,42 @@ self.compareObject = function(src,dst,parents,options){
 				next();
 			}else{
 				self.hasChanges = true;
-				self.prompt(key,srcVal,dstVal,parents,options)
-					.then(function(finalVal){
 
-						//Casting to number
-						if(typeof srcVal == 'number'){
-							finalVal = parseFloat(finalVal);
-							if (isNaN(finalVal)){
-								i--;
-								self.writeLine('The value has to be a number'.red);
+				if (!options.check){
+					self.prompt(key,srcVal,dstVal,parents,options)
+						.then(function(finalVal){
+
+							//Casting to number
+							if(typeof srcVal == 'number'){
+								finalVal = parseFloat(finalVal);
+								if (isNaN(finalVal)){
+									i--;
+									self.writeLine('The value has to be a number'.red);
+								}
 							}
-						}
 
-						//Casting to boolean
-						if(typeof srcVal == 'boolean'){
-							if (finalVal!=='true' && finalVal!=='false'){
-								i--;
-								self.writeLine('The value has to be true or false'.red);
+							//Casting to boolean
+							if(typeof srcVal == 'boolean'){
+								if (finalVal!=='true' && finalVal!=='false'){
+									i--;
+									self.writeLine('The value has to be true or false'.red);
+								}
+								finalVal = finalVal === 'true';
 							}
-							finalVal = finalVal === 'true';
-						}
 
-						//Value assignment
-						final[key] = finalVal;
+							//Value assignment
+							final[key] = finalVal;
 
-						//Next key
-						next();
-					});
+							//Next key
+							next();
+						});
+				}else{
+					if (parents.length){
+						key = parents.join('.')+'.'+key;
+					}
+					self.newKeys.push(key);
+					next();
+				}
 			}
 		}
 	};
