@@ -156,15 +156,20 @@ fn.compareObject(src,dst,[],{
 				fn.writeLine('|  '.yellow+fn.newKeys.toString().yellow.bold);
 				fn.writeLine('-------------------------------------'.yellow);
 				fn.writeLine();
+
+				setTimeout(function(){
+					fn.exit(1);
+				},1500);
 			}else{
 				fn.writeLine();
 				fn.writeLine('-------------------------------------'.green);
 				fn.writeLine('| No changes were found'.green);
 				fn.writeLine('-------------------------------------'.green);
+
+				setTimeout(function(){
+					fn.close();
+				},500);
 			}
-			setTimeout(function(){
-				fn.close();
-			},1500);
 		}
 
 	})
