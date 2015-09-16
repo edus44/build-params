@@ -3,6 +3,7 @@
 var path = require('path');
 var util = require('util');
 var colors = require('colors');
+var extend = require('extend');
 var q = require('q');
 var package = require('./package.json');
 var argv = require('yargs').argv;
@@ -16,14 +17,14 @@ fn.writeLine(package.name+' '+package.version);
 
 if (argv.help){
 	fn.writeLine();
-	fn.writeLine(' --help             Show this message'.yellow);
-	fn.writeLine(' --src <filename>   Source (dist) JSON file (default=parameters.json.dist)'.yellow);
-	fn.writeLine(' --dst <filename>   Destination JSON file (default=parameters.json)'.yellow);
-	fn.writeLine(' --suffix <suffix>  Suffix for \'parameters.{suffix}.json.dist\''.yellow);
-	fn.writeLine(' --print-src        Print the source JSON file'.yellow);
-	fn.writeLine(' --print-dst        Print the destination JSON file'.yellow);
-	fn.writeLine(' --review           Navigate through all keys'.yellow);
-	fn.writeLine(' --check            Only check for differences between src and dst'.yellow);
+	fn.writeLine(' --help               Show this message'.yellow);
+	fn.writeLine(' --src <filename>     Source (dist) JSON file (default=parameters.json.dist)'.yellow);
+	fn.writeLine(' --dst <filename>     Destination JSON file (default=parameters.json)'.yellow);
+	fn.writeLine(' --override <suffix>  Suffix for \'parameters.{suffix}.json.dist\', overrides source keys'.yellow);
+	fn.writeLine(' --print-src          Print the source JSON file'.yellow);
+	fn.writeLine(' --print-dst          Print the destination JSON file'.yellow);
+	fn.writeLine(' --review             Navigate through all keys'.yellow);
+	fn.writeLine(' --check              Only check for differences between src and dst'.yellow);
 	fn.writeLine();
 	fn.exit(0);
 }else{
@@ -31,8 +32,9 @@ if (argv.help){
 	fn.writeLine();
 }
 
-var suffix = argv.suffix ? argv.suffix+'.' : '';
-var srcFilename = argv.src || 'parameters.'+suffix+'json.dist';
+var override = argv.override;
+var ovrFilename = 'parameters.'+override+'.json.dist';
+var srcFilename = argv.src || 'parameters.json.dist';
 var dstFilename = argv.dst || 'parameters.json';
 
 ////////////////
@@ -54,6 +56,29 @@ try{
 }
 var srcMoment = fn.getModifiedMoment(srcFile);
 
+
+//////////////////
+//Override file //
+//////////////////
+
+if (override){
+	var ovrFile = path.resolve(cwd,ovrFilename);
+
+	//Handle file not found
+	if (!fn.fileExists(ovrFile)){
+		fn.writeLine(colors.red(ovrFile+' not found'));
+		fn.exit();
+	}
+
+	try{
+		var ovr = fn.readJson(ovrFile);
+	}catch(e){
+		fn.writeLine(colors.red('Malformed JSON '+ovrFile));
+		fn.exit();
+	}
+	var ovrMoment = fn.getModifiedMoment(ovrFile);
+}
+
 /////////////////////
 //Destination file //
 /////////////////////
@@ -72,10 +97,10 @@ var dstMoment = dstExists ? fn.getModifiedMoment(dstFile) : null;
 ////////////////
 //Init output //
 ////////////////
-//Suffix
-if (argv.suffix){
-	fn.writeLine('Suffix:'.green);
-	fn.writeLine(argv.suffix.blue);
+//Override
+if (override){
+	fn.writeLine('Override:'.green);
+	fn.writeLine(argv.override.blue);
 	fn.writeLine();
 }
 
@@ -89,6 +114,14 @@ fn.writeLine('Source json file:'.green);
 fn.write	(path.basename(srcFile).blue);
 fn.writeLine(colors.blue('  (modified '+srcMoment.fromNow()+ ' - ' +srcMoment.format('DD-MM-YYYY hh:mm:ss')+')'));
 fn.writeLine();
+
+//Override file
+if (override){
+	fn.writeLine('Override json file:'.green);
+	fn.write	(path.basename(ovrFile).blue);
+	fn.writeLine(colors.blue('  (modified '+srcMoment.fromNow()+ ' - ' +srcMoment.format('DD-MM-YYYY hh:mm:ss')+')'));
+	fn.writeLine();
+}
 
 //Dest file
 fn.writeLine('Destination json file:'.green);
@@ -110,6 +143,12 @@ if (argv.printSrc || argv.printDst){
 		fn.writeLine();
 		fn.writeLine('Source JSON file:'.green);
 		fn.writeLine(JSON.stringify(src,null,4).blue);
+
+		if (override){
+			fn.writeLine();
+			fn.writeLine('Override JSON file:'.green);
+			fn.writeLine(JSON.stringify(ovr,null,4).blue);
+		}
 	}
 	if (argv.printDst){
 		fn.writeLine();
@@ -120,6 +159,10 @@ if (argv.printSrc || argv.printDst){
 }
 
 
+//Overrides json
+if (override){
+	extend(true,src,ovr);
+}
 
 //Save the _comment object
 fn.fetchComments(src);

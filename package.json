@@ -1,17 +1,18 @@
 {
   "name": "build-params",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "",
   "main": "build-params.js",
   "dependencies": {
     "colors": "^1.1.2",
+    "extend": "^3.0.0",
     "moment": "^2.10.6",
     "q": "^1.4.1",
     "yargs": "^3.21.0"
   },
   "devDependencies": {},
   "scripts": {
-    "start" : "node ./build-params.js",
+    "start": "node ./build-params.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,7 +25,6 @@
     "url": "https://github.com/edus44/build-params/issues"
   },
   "homepage": "https://github.com/edus44/build-params",
-
   "preferGlobal": "true",
   "bin": {
     "build-params": "./build-params.js"
