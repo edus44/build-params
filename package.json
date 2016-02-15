@@ -1,6 +1,6 @@
 {
   "name": "build-params",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "",
   "main": "build-params.js",
   "dependencies": {
