@@ -170,7 +170,7 @@ fn.fetchComments(src);
 
 //Start the loop
 var check = !!argv.check;
-var interaction = !!argv.interaction;
+var interaction = argv.interaction !== false;
 fn.compareObject(src,dst,[],{
 	review : !!argv.review,
 	check : check,
