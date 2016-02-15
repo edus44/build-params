@@ -104,6 +104,11 @@ self.compareObject = function(src,dst,parents,options){
 					next();
 				});
 		}else{
+			if (!options.interaction){
+				final[key] = typeof dstVal != 'undefined' ? dstVal : srcVal;
+				next();
+			}
+			else 
 			if (!options.review && typeof dstVal != 'undefined'){
 				final[key] = dstVal;
 				next();

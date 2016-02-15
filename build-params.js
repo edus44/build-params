@@ -23,6 +23,7 @@ if (argv.help){
 	fn.writeLine(' --override <suffix>  Suffix for \'parameters.{suffix}.json.dist\', overrides source keys'.yellow);
 	fn.writeLine(' --print-src          Print the source JSON file'.yellow);
 	fn.writeLine(' --print-dst          Print the destination JSON file'.yellow);
+	fn.writeLine(' --no-interaction     Always uses the default or previous values, no prompts'.yellow);
 	fn.writeLine(' --review             Navigate through all keys'.yellow);
 	fn.writeLine(' --check              Only check for differences between src and dst'.yellow);
 	fn.writeLine();
@@ -169,14 +170,16 @@ fn.fetchComments(src);
 
 //Start the loop
 var check = !!argv.check;
+var interaction = !!argv.interaction;
 fn.compareObject(src,dst,[],{
 	review : !!argv.review,
 	check : check,
+	interaction : interaction
 })
 	.then(function(final){
 
 		if(!check){
-			if (fn.hasChanges){
+			if (fn.hasChanges || !interaction){
 				fn.writeLine();
 				fn.writeLine('Final JSON file:'.green);
 				fn.writeLine(JSON.stringify(final,null,4).blue);
