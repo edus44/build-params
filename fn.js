@@ -8,14 +8,14 @@ var readline = require('readline');
 
 
 var rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+	input: process.stdin,
+	output: process.stdout
 });
 
 //Fix color in prompt msg
 rl._setPrompt = rl.setPrompt;
 rl.setPrompt = function(prompt, length){
-    rl._setPrompt(prompt, length ? length : prompt.split(/[\r\n]/).pop().stripColors.length);
+	rl._setPrompt(prompt, length ? length : prompt.split(/[\r\n]/).pop().stripColors.length);
 };
 
 
@@ -100,6 +100,14 @@ self.compareObject = function(src,dst,parents,options){
 			copyParents.push(key);
 			self.compareObject(srcVal,dstVal,copyParents,options)
 				.then(function(finalVal){
+
+					//Convert back to array
+					if (Array.isArray(srcVal)){
+						finalVal = srcVal.map(function(v,k){
+							return finalVal[k];
+						});
+					}
+
 					final[key] = finalVal;
 					next();
 				});
